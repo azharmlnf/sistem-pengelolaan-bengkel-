@@ -1,11 +1,3 @@
- 
-
----
-
-# **Sistem Pengelolaan Bengkel Laravel** 🚗🔧  
-
-![Sistem Pengelolaan Bengkel](https://user-images.githubusercontent.com/yourusername/screenshot.png)  
-> *(Gantilah URL gambar di atas dengan screenshot dari sistem Anda)*  
 
 Ini adalah proyek sistem bengkel berbasis Laravel yang mencakup manajemen pelanggan, kendaraan, layanan servis, transaksi, dan suku cadang.  
 Proyek ini menggunakan **Laravel** sebagai backend dan **Filament** sebagai admin panel.  
