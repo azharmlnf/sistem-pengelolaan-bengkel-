@@ -12,6 +12,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Model;
 
 class CarResource extends Resource
 {
@@ -20,37 +23,61 @@ class CarResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-truck';
 
     public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('license_plate')
-                    ->required()
-                    ->maxLength(10)
-                    ->unique('cars', 'license_plate'),
-                Forms\Components\TextInput::make('brand')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'Truck' => 'Truck',
-                        'Car' => 'Car',
-                        'Bus' => 'Bus',
-                        'Trailer' => 'Trailer',
-                        'Pickup' => 'Pickup',
-                        'Van' => 'Van',
-                        'other' => 'Other'
-                    ])
-                    ->default('other')
-                    ->required(),
-                    Forms\Components\Select::make('customer_id')
-                    ->relationship('customer', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\FileUpload::make('car_image')
-                    ->image(),
-            ]);
+{
+    return $form
+        ->schema([
+            Forms\Components\TextInput::make('license_plate')
+                ->required()
+                ->maxLength(10)
+                ->live() // Memastikan perubahan langsung tervalidasi
+                ->afterStateUpdated(function (Set $set, $state) {
+                    // Cek apakah license_plate sudah ada di database
+                    if (Car::where('license_plate', $state)->exists()) {
+                        Notification::make()
+                            ->title('License plate already taken')
+                            ->danger()
+                            ->send();
+                            
+                        $set('license_plate', null); // Reset input jika duplikat
+                    }
+                }),
+            Forms\Components\TextInput::make('brand')
+                ->required()
+                ->maxLength(100),
+            Forms\Components\Select::make('type')
+                ->options([
+                    'Truck' => 'Truck',
+                    'Car' => 'Car',
+                    'Bus' => 'Bus',
+                    'Trailer' => 'Trailer',
+                    'Pickup' => 'Pickup',
+                    'Van' => 'Van',
+                    'other' => 'Other'
+                ])
+                ->default('other')
+                ->required(),
+            Forms\Components\Select::make('customer_id')
+                ->relationship('customer', 'name')
+                ->searchable()
+                ->preload()
+                ->required(),
+            Forms\Components\FileUpload::make('car_image')
+                ->image(),
+        ]);
+}
+
+// Tambahkan validasi saat menyimpan (CREATE)
+public static function beforeCreate(Model $record): void
+{
+    if (Car::where('license_plate', $record->license_plate)->exists()) {
+        Notification::make()
+            ->title('License plate already taken')
+            ->danger()
+            ->send();
+        
+        throw new \Exception('License plate already taken');
     }
+}
 
     public static function table(Table $table): Table
     {
