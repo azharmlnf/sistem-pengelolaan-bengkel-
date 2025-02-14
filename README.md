@@ -17,10 +17,8 @@ Pastikan perangkat Anda sudah terinstal:
 ## **🛠️ Cara Install dan Menjalankan Project**
 ### **1️⃣ Clone Repository**
 ```sh
-git clone https://github.com/username/repo-sistem-bengkel.git
-cd repo-sistem-bengkel
+git clone https://github.com/azharmlnf/sistem-pengelolaan-bengkel-.git
 ```
-> Gantilah `username/repo-sistem-bengkel` dengan URL repository Anda.
 
 ### **2️⃣ Install Dependencies**
 ```sh
